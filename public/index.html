@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ayy lmao</title>
+        <script src="./../node_modules/tincanjs/build/tincan.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+        <script src="./js/chance.js"></script>
+        <script src="./js/onderwijsdata.min.js"></script>
+        <script src="./js/names.js"></script>
+        <script src="./js/locations.js"></script>
+        <style>
+            body {
+                font-family: "Courier New";
+            }
+            .contain, .container {
+                border: 2px solid black;
+            }
+            .ind {
+                font-family: Wingdings;
+            }
+            .unready {
+                color: red;
+            }
+            .ready {
+                color: lime;
+            }
+            table {
+                width: 100%;
+                padding-left: auto;
+                padding-right: auto;
+            }
+            td {
+                padding-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="anagram">MOCK DATA FOR DAYS</h1>
+        <div class="contain"><h2>Response: <span class="ind" id="rs">&#x2718;</span></h2><div class="response"></div></div>
+        <div class="contain"><h2>Verbs: <span class="ind unready" id="vb">&#x2718;</span></h2><div class="verblist"></div></div>
+        <button class="getmore">REFRESH STATEMENTS</button>
+        <p class="raw"></p>
+        <script>
+            // the following utility functions all cannibalized shamelessly
+            // from the excellent brains on stackoverflow
+            function randIntBetween(min,max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            }
+
+            function middleFactors(n) {
+                var p1, p2;
+                for (var f1 = 1; f1 < n; ++f1) {
+                    var f2 = n / f1;
+                    if (f2 == Math.floor(f2)) {
+                        p1 = f1;
+                        p2 = f2;
+                    }
+                    if (f2 <= f1) {
+                        break;
+                    }
+                }
+                return [p1,p2];
+            }            
+
+            // my code starts here
+            function callbackAllStatements (err,result) {
+                resp.html("");
+                if (err !== null) {
+                    resp.append("<h2>Err:</h2><p>" + err + "</p>");
+                }
+                var stmlen = result.statements.length;
+                var verbarr = [];
+                for (var i = 0; i < stmlen; i++) {
+                    var stm = result.statements[i];
+                    var toAppend = "";
+                    if (stm.actor.account !== null) {
+                        toAppend = '<p><a href="' + stm.actor.account.homePage + '/' + stm.actor.account.name + '">' + stm.actor.name + '</a> <a href="' + stm.verb.id + '">' + stm.verb.display["en-US"] + '</a> <a href="' + stm.target.id + '">' + stm.target.objectType + '</a></p>';
+                    } else {
+                        toAppend = '<p><a href="' + stm.actor.mbox + '">' + stm.actor.name + '</a> <a href="' + stm.verb.id + '">' + stm.verb.display["en-US"] + '</a> <a href="' + stm.target.id + '">' + stm.target.objectType + '</a></p>';
+                    }
+	                resp.append(toAppend);
+	                if (verbarr.indexOf(stm.verb.display["en-US"]) == -1) {
+	                    verbarr.push(stm.verb.display["en-US"]);
+	                }
+                    
+                }
+                resp.hide();
+                $("#rs").removeClass("unready").addClass("ready").html("&#x2714;");
+                //console.log('response received');
+
+                verbarr.sort();
+                var amtverbs = verbarr.length;
+                var tblDims = middleFactors(amtverbs);
+                                
+                varb.html("");
+                varb.append('<table class="verbtable"></table>');
+                for (var i = 0; i < tblDims[1]; i++) {
+                    $(".verbtable").append('<tr id="verbrow' + i + '"></tr>');
+                    for (var j = 0; j < tblDims[0]; j++) {
+                        var next = verbarr.shift();
+                        var what = "#verbrow" + i;
+                        $(what).append('<td class="verbcell">' + next + '</td>');
+                    }
+                }
+                varb.hide();
+                $("#vb").removeClass("unready").addClass("ready").html("&#x2714;");
+                //console.log('verbs parsed');
+
+                $(document).trigger("response_parsed");
+            }
+
+            function callbackDocuments(data, text, jq){
+//                console.log(text);
+                console.log(data);
+//                console.log(jq);
+            }
+
+            var resp = $(".response");
+            var varb = $(".verblist");
+            var cont = $(".contain");
+
+            $(document).on("response_parsed", function(){
+                $(".verbcell").on("click", function(evt){
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    $("#verb").val(evt.currentTarget.innerText);
+                });
+            });
+
+            $(document).on("statements_wanted", function(){
+                if ($("#rs").hasClass("ready")) {
+                    $("#rs").removeClass("ready").addClass("unready");
+                }
+                tincan.getStatements({
+                    params: {
+                    },
+                    callback: function (err,result) {
+                        callbackAllStatements(err, result);
+                    }
+                });
+            });
+
+            $(document).on("documents_wanted", function(){
+                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/activities/state", {}, callbackDocuments, "json");
+                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/activities/profile", {}, callbackDocuments, "json");
+                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/agent/profile", {}, callbackDocuments, "json");
+            });
+
+            cont.on("click", function(evt){
+                $(evt.currentTarget.lastElementChild).slideToggle();
+            });
+
+            function setHeaders(xhr,headerobj){
+                for (var headername in headerobj) {
+                    xhr.setRequestHeader(headername, headerobj[headername]);
+                }
+            }
+            function logParsedResponse(e){
+                if (this.readyState === 4 && this.status === 200) {
+                    console.log(JSON.parse(this.response));
+                }
+            }
+
+            $(document).ready(function(){
+                var headers = {
+	                "Authorization": "Basic " + btoa("larissa:lrstester"),
+	                "Content-Type": "application/json",
+	                "X-Experience-API-Version": "1.0.1"
+	            };
+                var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
+                
+                (function(){
+                    var req = new XMLHttpRequest();
+                    req.open("POST",lrs);
+                    setHeaders(req,headers);
+                    req.onreadystatechange = logParsedResponse;
+                    var data = {
+                        actor: {
+                            objectType: "Agent",
+                            mbox: "mailto:fuck@blat.com"
+                        },
+                        verb: {
+                            id: "http://adlnet.gov/expapi/verbs/attempted",
+                            display: {
+                                "en-US": "attempted"
+                            }
+                        },
+                        object: {
+                            objectType: "Activity",
+                            id: "http://rusticisoftware.github.com/TinCanJS"
+                        }
+                    };
+                    req.send(JSON.stringify(data));
+                })();
+                (function(){
+	                var req = new XMLHttpRequest();
+	                req.open("GET",lrs);
+	                setHeaders(req,headers);
+	                req.onreadystatechange = logParsedResponse;
+	                req.send(null);
+                })();
+            });
+        </script>
+        <!-- <script src="./js/statementGenerator.js"></script> -->
+    </body>
+</html>
