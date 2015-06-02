@@ -64,6 +64,20 @@
             }            
 
             // my code starts here
+
+            var tincan = new TinCan(
+                {
+                    recordstores: [
+                        {
+                            endpoint: "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements",
+                            username: "larissa",
+                            password: "lrstester",
+                            allowFail: false
+                        }
+                    ]
+                }
+            );
+
             function callbackAllStatements (err,result) {
                 resp.html("");
                 if (err !== null) {
@@ -162,6 +176,41 @@
                 }
             }
 
+            function xmlpost (url, headers) {
+                var req = new XMLHttpRequest();
+                req.open("POST",url);
+                setHeaders(req,headers);
+                req.onreadystatechange = logParsedResponse;
+                var data = {
+                    actor: {
+                        objectType: "Agent",
+                        mbox: "mailto:fuck@blat.com"
+                    },
+                    verb: {
+                        id: "http://adlnet.gov/expapi/verbs/attempted",
+                        display: {
+                            "en-US": "attempted"
+                        }
+                    },
+                    object: {
+                        objectType: "Activity",
+                        id: "http://rusticisoftware.github.com/TinCanJS"
+                    }
+                };
+                req.send(JSON.stringify(data));
+            }
+
+            function xmlget (url, headers) {
+                var req = new XMLHttpRequest();
+                req.open("GET",url);
+                setHeaders(req,headers);
+                req.onreadystatechange = logParsedResponse;
+                req.send(null);
+            }
+
+
+
+
             $(document).ready(function(){
                 var headers = {
 	                "Authorization": "Basic " + btoa("larissa:lrstester"),
@@ -170,36 +219,10 @@
 	            };
                 var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
                 
-                (function(){
-                    var req = new XMLHttpRequest();
-                    req.open("POST",lrs);
-                    setHeaders(req,headers);
-                    req.onreadystatechange = logParsedResponse;
-                    var data = {
-                        actor: {
-                            objectType: "Agent",
-                            mbox: "mailto:fuck@blat.com"
-                        },
-                        verb: {
-                            id: "http://adlnet.gov/expapi/verbs/attempted",
-                            display: {
-                                "en-US": "attempted"
-                            }
-                        },
-                        object: {
-                            objectType: "Activity",
-                            id: "http://rusticisoftware.github.com/TinCanJS"
-                        }
-                    };
-                    req.send(JSON.stringify(data));
-                })();
-                (function(){
-	                var req = new XMLHttpRequest();
-	                req.open("GET",lrs);
-	                setHeaders(req,headers);
-	                req.onreadystatechange = logParsedResponse;
-	                req.send(null);
-                })();
+                $(document).trigger("statements_wanted");
+
+                // xmlpost(lrs,headers);
+                // xmlget(lrs,headers);
             });
         </script>
         <!-- <script src="./js/statementGenerator.js"></script> -->
