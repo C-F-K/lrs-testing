@@ -69,16 +69,19 @@
                 {
                     recordstores: [
                         {
-                            endpoint: "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements",
-                            username: "larissa",
-                            password: "lrstester",
+                            // endpoint: "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements",
+                            // username: "larissa",
+                            // password: "lrstester",
+                            endpoint: "http://centaurus.ic.uva.nl/larissa/xAPI/statements",
+                            username: "cameron",
+                            password: "lig89324ehater",
                             allowFail: false
                         }
                     ]
                 }
             );
 
-            function callbackAllStatements (err,result) {
+            function callbackStatements (err,result) {
                 resp.html("");
                 if (err !== null) {
                     resp.append("<h2>Err:</h2><p>" + err + "</p>");
@@ -124,16 +127,6 @@
                 $(document).trigger("response_parsed");
             }
 
-            function callbackDocuments(data, text, jq){
-//                console.log(text);
-                console.log(data);
-//                console.log(jq);
-            }
-
-            var resp = $(".response");
-            var varb = $(".verblist");
-            var cont = $(".contain");
-
             $(document).on("response_parsed", function(){
                 $(".verbcell").on("click", function(evt){
                     evt.stopPropagation();
@@ -148,18 +141,17 @@
                 }
                 tincan.getStatements({
                     params: {
+                        limit: 50
                     },
                     callback: function (err,result) {
-                        callbackAllStatements(err, result);
+                        callbackStatements(err, result);
                     }
                 });
             });
 
-            $(document).on("documents_wanted", function(){
-                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/activities/state", {}, callbackDocuments, "json");
-                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/activities/profile", {}, callbackDocuments, "json");
-                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/agent/profile", {}, callbackDocuments, "json");
-            });
+            var resp = $(".response");
+            var varb = $(".verblist");
+            var cont = $(".contain");
 
             cont.on("click", function(evt){
                 $(evt.currentTarget.lastElementChild).slideToggle();
@@ -208,8 +200,17 @@
                 req.send(null);
             }
 
+            function callbackDocuments(data, text, jq){
+//                console.log(text);
+                console.log(data);
+//                console.log(jq);
+            }
 
-
+            $(document).on("documents_wanted", function(){
+                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/activities/state", {}, callbackDocuments, "json");
+                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/activities/profile", {}, callbackDocuments, "json");
+                $.get("http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/agent/profile", {}, callbackDocuments, "json");
+            });
 
             $(document).ready(function(){
                 var headers = {
@@ -217,11 +218,12 @@
 	                "Content-Type": "application/json",
 	                "X-Experience-API-Version": "1.0.1"
 	            };
-                var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
-                
-                $(document).trigger("statements_wanted");
+                // var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
+                var lrs = "http://127.0.0.1:1337/";
 
-                // xmlpost(lrs,headers);
+                // $(document).trigger("statements_wanted");
+
+                xmlpost(lrs,headers);
                 // xmlget(lrs,headers);
             });
         </script>
