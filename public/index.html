@@ -37,7 +37,7 @@
     </head>
     <body>
         <h1 class="anagram">LRS TESTING THO</h1>
-        <div class="contain"></div>
+        <div class="contain"><p><button class="postbutton">POST</button></p><p><button class="getbutton">GET</button></p></div>
         <script>
             function setHeaders(xhr,headerobj){
                 for (var headername in headerobj) {
@@ -50,31 +50,15 @@
                 }
             }
 
-            function xmlpost (url, headers) {
+            function xmlPostLogged (url, headers, data) {
                 var req = new XMLHttpRequest();
                 req.open("POST",url);
                 setHeaders(req,headers);
                 req.onreadystatechange = logParsedResponse;
-                var data = {
-                    actor: {
-                        objectType: "Agent",
-                        mbox: "mailto:shto@blat.com"
-                    },
-                    verb: {
-                        id: "http://adlnet.gov/expapi/verbs/attempted",
-                        display: {
-                            "en-US": "attempted"
-                        }
-                    },
-                    object: {
-                        objectType: "Activity",
-                        id: "http://rusticisoftware.github.com/TinCanJS"
-                    }
-                };
                 req.send(JSON.stringify(data));
             }
 
-            function xmlget (url, headers) {
+            function xmlGetLogged (url, headers) {
                 var req = new XMLHttpRequest();
                 req.open("GET",url);
                 setHeaders(req,headers);
@@ -92,18 +76,39 @@
                 $.get("http://centaurus.ic.uva.nl/larissa/xAPI/agent/profile", {}, callbackDocuments, "json");
             });
 
+            var headers = {
+                "Authorization": "Basic " + btoa("cameron:lig89324ehater"),
+                "Content-Type": "application/json",
+                "X-Experience-API-Version": "1.0.1"
+            };
+            // var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
+            var lrs = "https://centaurus.ic.uva.nl/larissa/xAPI/statements";
+            var data = {
+                actor: {
+                    objectType: "Agent",
+                    mbox: "mailto:shto@blat.com"
+                },
+                verb: {
+                    id: "http://adlnet.gov/expapi/verbs/attempted",
+                    display: {
+                        "en-US": "attempted"
+                    }
+                },
+                object: {
+                    objectType: "Activity",
+                    id: "http://rusticisoftware.github.com/TinCanJS"
+                }
+            };
+
+            $(".postbutton").on("click", function(){
+                xmlPostLogged(lrs,headers,data);
+            });
+            $(".getbutton").on("click", function(){
+                xmlGetLogged(lrs,headers);
+            });
+
             $(document).ready(function(){
-                var headers = {
-	                "Authorization": "Basic " + btoa("cameron:lig89324ehater"),
-	                "Content-Type": "application/json",
-	                "X-Experience-API-Version": "1.0.1"
-	            };
-                // var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
-                var lrs = "https://centaurus.ic.uva.nl/larissa/xAPI/statements?limit=10";
-
-
-                // xmlpost(lrs,headers);
-                xmlget(lrs,headers);
+                // vitamins ready
             });
         </script>
     </body>
