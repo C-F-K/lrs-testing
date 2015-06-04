@@ -66,16 +66,6 @@
                 req.send(null);
             }
 
-            function callbackDocuments(data){
-                console.log(data);
-            }
-
-            $(document).on("documents_wanted", function(){
-                $.get("http://centaurus.ic.uva.nl/larissa/xAPI/activities/state", {}, callbackDocuments, "json");
-                $.get("http://centaurus.ic.uva.nl/larissa/xAPI/activities/profile", {}, callbackDocuments, "json");
-                $.get("http://centaurus.ic.uva.nl/larissa/xAPI/agent/profile", {}, callbackDocuments, "json");
-            });
-
             var headers = {
                 "Authorization": "Basic " + btoa("cameron:lig89324ehater"),
                 "Content-Type": "application/json",
