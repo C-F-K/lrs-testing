@@ -37,7 +37,22 @@
     </head>
     <body>
         <h1 class="anagram">LRS TESTING THO</h1>
-        <div class="contain"><p><button class="postbutton">POST</button></p><p><button class="getbutton">GET</button></p></div>
+        <div class="contain">
+            <form id="authcreds" action="">
+                <p><input type="radio" name="creds" value="centaurus">Centaurus<input type="radio" name="creds" value="local">Local LRS<input type="radio" name="creds" value="other">Other</p>
+            </form>
+            <p class="othercreds">Username: <input type="text" id="otheruser"></input></p>
+            <p class="othercreds">Password: <input type="text" id="otherpass"></input></p>
+            <p>
+                <input id="request" type="textarea" value="" style="width:50%"></input>
+                <!-- <span id="tricky" style="display:none;"></span> -->
+            </p>
+            <p><button class="postbutton">POST</button></p>
+            <p><button class="getbutton">GET</button></p>
+        </div>
+        <div>
+            <a href="./fixin_larissa.html">How to fix Larissa</a>
+        </div>
         <script>
             function setHeaders(xhr,headerobj){
                 for (var headername in headerobj) {
@@ -46,7 +61,12 @@
             }
             function logParsedResponse(e){
                 if (this.readyState === 4 && this.status === 200) {
-                    console.log(JSON.parse(this.response));
+                    var res = JSON.parse(this.response);
+                    console.log(res);
+                    if (res.more) {
+                        var newlrs = lrs.replace(/\/larissa\/xAPI\/statements.*$/, "");
+                        $('#request').val(newlrs + res.more);
+                    }
                 }
             }
 
@@ -66,22 +86,38 @@
                 req.send(null);
             }
 
+            var endpoints = {
+                "centaurus": {
+                    "lrs": "https://centaurus.ic.uva.nl",
+                    // "auth": "cameron:lig89324ehater"
+                    "auth": "kettle_fnwi_1:sm0k3m1fy4g0tt3m"
+                    // "auth": "uvaInform_fnwi_1:m4rxFr3udN1cC4g3"
+                },
+                "local": {
+                    // "lrs": "http://ck-pc.ic.uva.nl",
+                    "lrs": "http://localhost:8080",
+                    "auth": "cfk:h3153nb3rg"
+                },
+                "dev": {
+                    "lrs": "http://lrs-dev.ic.uva.nl:8080"
+                }
+            };
+
             var headers = {
-                "Authorization": "Basic " + btoa("cameron:lig89324ehater"),
+                "Authorization": "",
                 "Content-Type": "application/json",
                 "X-Experience-API-Version": "1.0.1"
             };
-            // var lrs = "http://lrs-dev.ic.uva.nl:8080/larissa/xAPI/statements";
-            var lrs = "https://centaurus.ic.uva.nl/larissa/xAPI/statements";
+
             var data = {
                 actor: {
                     objectType: "Agent",
                     mbox: "mailto:shto@blat.com"
                 },
                 verb: {
-                    id: "http://adlnet.gov/expapi/verbs/attempted",
+                    id: "http://adlnet.gov/expapi/verbs/scored",
                     display: {
-                        "en-US": "attempted"
+                        "en-US": "scored"
                     }
                 },
                 object: {
@@ -90,15 +126,45 @@
                 }
             };
 
+            // $('#request').on("change",function(e) {
+            //     console.log('blat');
+            //     if (e.which !== 0 && e.charCode !== 0) { // only characters
+            //         var c = String.fromCharCode(e.keyCode|e.charCode);
+            //         $span = $(this).siblings('#tricky').first();
+            //         $span.text($(this).val() + c) ; // the hidden span takes 
+            //                                         // the value of the input
+            //         $inputSize = $span.width() ; 
+            //         $(this).css("width", $inputSize) ; // apply width of the span to the input
+            //      }
+            // });
+
+            $('#authcreds').on("change", function(){
+                var creds = $("input[name=creds]:checked").val();
+                if (creds == "other") {
+                    $('.othercreds').slideDown();
+                    var credstr = $('#otheruser').val() + ':' + $('#otherpass').val();
+                    $('#request').val("");
+                    headers["Authorization"] = "Basic " + btoa(credstr)
+                } else {
+                    if (endpoints[creds]) {
+                        $('.othercreds').slideUp();
+                        window.lrs = endpoints[creds].lrs + "/larissa/xAPI/statements";
+                        $('#request').val(window.lrs);
+                        headers["Authorization"] = "Basic " + btoa(endpoints[creds].auth)
+                    }
+                }
+            });
+
             $(".postbutton").on("click", function(){
-                xmlPostLogged(lrs,headers,data);
+                xmlPostLogged($('#request').val(),headers,data);
             });
             $(".getbutton").on("click", function(){
-                xmlGetLogged(lrs,headers);
+                xmlGetLogged($('#request').val(),headers);
             });
 
             $(document).ready(function(){
                 // vitamins ready
+                $('.othercreds').hide();
             });
         </script>
     </body>
