@@ -1,21 +1,17 @@
 {
-  "name": "ast-server",
+  "name": "lrs-testing",
   "version": "0.0.1",
-  "description": "Simple AST server",
+  "description": "simple app to test LRS connectivity",
   "dependencies": {
-    "express": "~3.5.1",
-    "tincanjs": "~0.32.0"
+    "express": "~3.5.1"
   },
-  "devDependencies": {
-    "bower": "~1.3.2",
-    "chance": "^0.7.3"
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "node server.js"
   },
   "engines": {
     "node": "0.10.x"
   },
-  "author": "Yeehaa",
-  "license": "MIT"
+  "author": "CFK",
+  "license": "Apache2"
 }
