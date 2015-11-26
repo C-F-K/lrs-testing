@@ -2,148 +2,64 @@
 <html>
     <head>
         <title>ayy lmao</title>
-        <script src="./../node_modules/tincanjs/build/tincan.js"></script>
+        <link href="./styles.css" rel="stylesheet" type="text/css">
+        <!-- <script src="./../node_modules/tincanjs/build/tincan.js"></script> -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-        <!-- <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script> -->
-        <!-- <script src="./js/chance.js"></script> -->
-        <!-- <script src="./js/onderwijsdata.min.js"></script> -->
-        <!-- <script src="./js/names.js"></script> -->
-        <!-- <script src="./js/locations.js"></script> -->
-        <style>
-            body {
-                font-family: "Courier New";
-            }
-            .contain, .container {
-                border: 2px solid black;
-            }
-            .ind {
-                font-family: Wingdings;
-            }
-            .unready {
-                color: red;
-            }
-            .ready {
-                color: lime;
-            }
-            table {
-                width: 100%;
-                padding-left: auto;
-                padding-right: auto;
-            }
-            td {
-                padding-bottom: 5px;
-            }
-        </style>
+        <script src="./app.js"></script>
     </head>
     <body>
         <h1 class="anagram">LRS TESTING THO</h1>
+        <h3>open your dev console</h3>
         <div class="contain">
-            <form id="authcreds" action="">
-                <p><input type="radio" name="creds" value="centaurus">Centaurus<input type="radio" name="creds" value="local">Local LRS<input type="radio" name="creds" value="other">Other</p>
-            </form>
-            <p class="othercreds">Username: <input type="text" id="otheruser"></input></p>
-            <p class="othercreds">Password: <input type="text" id="otherpass"></input></p>
-            <p>
-                <input id="request" type="textarea" value="" style="width:50%"></input>
-                <!-- <span id="tricky" style="display:none;"></span> -->
-            </p>
-            <p><button class="postbutton">POST</button></p>
-            <p><button class="getbutton">GET</button></p>
+            <div class="lrsform"
+                <form id="authcreds" action="">
+                    <p><input type="radio" name="creds" value="centaurus">Centaurus<input type="radio" name="creds" value="draco">Draco<input type="radio" name="creds" value="local">Local LRS<input type="radio" name="creds" value="other">Other</p>
+                </form>
+                <p class="othercreds">Username: <input type="text" id="otheruser"></input></p>
+                <p class="othercreds">Password: <input type="password" id="otherpass"></input></p>
+                <p>
+                    <input id="request" type="textarea" value="" style="width:50%"></input>
+                    <!-- <span id="tricky" style="display:none;"></span> -->
+                </p>
+            </div>
+            <div class="lrsdata">
+                <p><textarea class="postdata"></textarea></p>
+            </div>
+            <p><button class="get button">GET</button><button class="post button">POST</button></p>
+            <p></p>
         </div>
         <div>
-            <a href="./fixin_larissa.html">How to fix Larissa</a>
+            <p><a href="./fixin_larissa.html">How to fix Larissa</a></p>
         </div>
         <script>
-            function setHeaders(xhr,headerobj){
-                for (var headername in headerobj) {
-                    xhr.setRequestHeader(headername, headerobj[headername]);
+            $("textarea").keydown(function(e) {
+                // thanks stackoverflow
+                if(e.keyCode === 9) { // tab was pressed
+                    // get caret position/selection
+                    var start = this.selectionStart;
+                    var end = this.selectionEnd;
+
+                    var $this = $(this);
+                    var value = $this.val();
+
+                    // set textarea value to: text before caret + tab + text after caret
+                    $this.val(value.substring(0, start)
+                                + "\t"
+                                + value.substring(end));
+
+                    // put caret at right position again (add one for the tab)
+                    this.selectionStart = this.selectionEnd = start + 1;
+
+                    // prevent the focus lose
+                    e.preventDefault();
                 }
-            }
-            function logParsedResponse(e){
-                if (this.readyState === 4 && this.status === 200) {
-                    var res = JSON.parse(this.response);
-                    console.log(res);
-                    if (res.more) {
-                        var newlrs = lrs.replace(/\/larissa\/xAPI\/statements.*$/, "");
-                        $('#request').val(newlrs + res.more);
-                    }
-                }
-            }
-
-            function xmlPostLogged (url, headers, data) {
-                var req = new XMLHttpRequest();
-                req.open("POST",url);
-                setHeaders(req,headers);
-                req.onreadystatechange = logParsedResponse;
-                req.send(JSON.stringify(data));
-            }
-
-            function xmlGetLogged (url, headers) {
-                var req = new XMLHttpRequest();
-                req.open("GET",url);
-                setHeaders(req,headers);
-                req.onreadystatechange = logParsedResponse;
-                req.send(null);
-            }
-
-            var endpoints = {
-                "centaurus": {
-                    "lrs": "https://centaurus.ic.uva.nl",
-                    // "auth": "cameron:lig89324ehater"
-                    "auth": "kettle_fnwi_1:sm0k3m1fy4g0tt3m"
-                    // "auth": "uvaInform_fnwi_1:m4rxFr3udN1cC4g3"
-                },
-                "local": {
-                    // "lrs": "http://ck-pc.ic.uva.nl",
-                    "lrs": "http://localhost:8080",
-                    "auth": "cfk:h3153nb3rg"
-                },
-                "dev": {
-                    "lrs": "http://lrs-dev.ic.uva.nl:8080"
-                }
-            };
-
-            var headers = {
-                "Authorization": "",
-                "Content-Type": "application/json",
-                "X-Experience-API-Version": "1.0.1"
-            };
-
-            var data = {
-                actor: {
-                    objectType: "Agent",
-                    mbox: "mailto:shto@blat.com"
-                },
-                verb: {
-                    id: "http://adlnet.gov/expapi/verbs/scored",
-                    display: {
-                        "en-US": "scored"
-                    }
-                },
-                object: {
-                    objectType: "Activity",
-                    id: "http://rusticisoftware.github.com/TinCanJS"
-                }
-            };
-
-            // $('#request').on("change",function(e) {
-            //     console.log('blat');
-            //     if (e.which !== 0 && e.charCode !== 0) { // only characters
-            //         var c = String.fromCharCode(e.keyCode|e.charCode);
-            //         $span = $(this).siblings('#tricky').first();
-            //         $span.text($(this).val() + c) ; // the hidden span takes 
-            //                                         // the value of the input
-            //         $inputSize = $span.width() ; 
-            //         $(this).css("width", $inputSize) ; // apply width of the span to the input
-            //      }
-            // });
+            });
 
             $('#authcreds').on("change", function(){
                 var creds = $("input[name=creds]:checked").val();
                 if (creds == "other") {
                     $('.othercreds').slideDown();
                     var credstr = $('#otheruser').val() + ':' + $('#otherpass').val();
-                    $('#request').val("");
                     headers["Authorization"] = "Basic " + btoa(credstr)
                 } else {
                     if (endpoints[creds]) {
@@ -155,16 +71,18 @@
                 }
             });
 
-            $(".postbutton").on("click", function(){
+            $(".post").on("click", function(){
+                data = JSON.parse($('.postdata').val());
                 xmlPostLogged($('#request').val(),headers,data);
             });
-            $(".getbutton").on("click", function(){
+            $(".get").on("click", function(){
                 xmlGetLogged($('#request').val(),headers);
             });
 
             $(document).ready(function(){
                 // vitamins ready
                 $('.othercreds').hide();
+                $('.postdata').val(JSON.stringify(data, null, "\t"));
             });
         </script>
     </body>

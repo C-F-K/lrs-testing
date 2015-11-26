@@ -1,2 +1,4 @@
 node_modules
-tcpublicstatement.json
+plan.txt
+.gitignore
+/public/olde

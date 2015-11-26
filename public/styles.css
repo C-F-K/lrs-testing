@@ -1,0 +1,14 @@
+body {
+    font-family: "Courier New";
+}
+.contain, .container {
+    border: 2px solid black;
+}
+.button, .lrsform, .lrsdata {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+textarea {
+    width:75%;
+    height:20em;
+}
