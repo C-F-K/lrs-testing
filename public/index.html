@@ -11,12 +11,10 @@
         <h1 class="anagram">LRS TESTING THO</h1>
         <h3>open your dev console</h3>
         <div class="contain">
-            <div class="lrsform"
-                <form id="authcreds" action="">
-                    <p><input type="radio" name="creds" value="centaurus">Centaurus<input type="radio" name="creds" value="draco">Draco<input type="radio" name="creds" value="local">Local LRS<input type="radio" name="creds" value="other">Other</p>
-                </form>
+            <div class="lrsform">
                 <p class="othercreds">Username: <input type="text" id="otheruser"></input></p>
                 <p class="othercreds">Password: <input type="password" id="otherpass"></input></p>
+                <p><button class="acceptcreds">Confirm</button></p>
                 <p>
                     <input id="request" type="textarea" value="" style="width:50%"></input>
                     <!-- <span id="tricky" style="display:none;"></span> -->
@@ -29,7 +27,6 @@
             <p></p>
         </div>
         <div>
-            <p><a href="./fixin_larissa.html">How to fix Larissa</a></p>
         </div>
         <script>
             $("textarea").keydown(function(e) {
@@ -55,20 +52,9 @@
                 }
             });
 
-            $('#authcreds').on("change", function(){
-                var creds = $("input[name=creds]:checked").val();
-                if (creds == "other") {
-                    $('.othercreds').slideDown();
+            $('.acceptcreds').on("click", function(){
                     var credstr = $('#otheruser').val() + ':' + $('#otherpass').val();
-                    headers["Authorization"] = "Basic " + btoa(credstr)
-                } else {
-                    if (endpoints[creds]) {
-                        $('.othercreds').slideUp();
-                        window.lrs = endpoints[creds].lrs + "/larissa/xAPI/statements";
-                        $('#request').val(window.lrs);
-                        headers["Authorization"] = "Basic " + btoa(endpoints[creds].auth)
-                    }
-                }
+                    headers["Authorization"] = "Basic " + btoa(credstr);
             });
 
             $(".post").on("click", function(){

@@ -32,26 +32,6 @@ function xmlGetLogged (url, headers) {
     req.send(null);
 }
 
-var endpoints = {
-    "centaurus": {
-        "lrs": "https://centaurus.ic.uva.nl",
-        "auth": "cameron:lig89324ehater"
-        // "auth": "kettle_fnwi_1:sm0k3m1fy4g0tt3m"
-        // "auth": "kettle_cjkr_1:th4t5ju5ty0ur0p1n10nm4n"
-        // "auth": "uvaInform_fnwi_1:m4rxFr3udN1cC4g3"
-        // "auth": "kettle_fnwi_old:th3dud34b1d35m4n"
-    },
-    "draco": {
-        "lrs": "https://draco.ic.uva.nl",
-        "auth": "cameron:lig89324ehater"
-    },
-    "local": {
-        "lrs": "http://ck-pc.ic.uva.nl:8080",
-        // "lrs": "http://localhost:8080",
-        "auth": "cfk:h3153nb3rg"
-    }
-};
-
 var headers = {
     "Authorization": "",
     "Content-Type": "application/json",
