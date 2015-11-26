@@ -14,7 +14,6 @@
             <div class="lrsform">
                 <p class="othercreds">Username: <input type="text" id="otheruser"></input></p>
                 <p class="othercreds">Password: <input type="password" id="otherpass"></input></p>
-                <p><button class="acceptcreds">Confirm</button></p>
                 <p>
                     <input id="request" type="textarea" value="" style="width:50%"></input>
                     <!-- <span id="tricky" style="display:none;"></span> -->
@@ -52,22 +51,20 @@
                 }
             });
 
-            $('.acceptcreds').on("click", function(){
-                    var credstr = $('#otheruser').val() + ':' + $('#otherpass').val();
-                    headers["Authorization"] = "Basic " + btoa(credstr);
-            });
-
             $(".post").on("click", function(){
+                var credstr = $('#otheruser').val() + ':' + $('#otherpass').val();
+                headers["Authorization"] = "Basic " + btoa(credstr);
                 data = JSON.parse($('.postdata').val());
                 xmlPostLogged($('#request').val(),headers,data);
             });
             $(".get").on("click", function(){
+                var credstr = $('#otheruser').val() + ':' + $('#otherpass').val();
+                headers["Authorization"] = "Basic " + btoa(credstr);
                 xmlGetLogged($('#request').val(),headers);
             });
 
             $(document).ready(function(){
                 // vitamins ready
-                $('.othercreds').hide();
                 $('.postdata').val(JSON.stringify(data, null, "\t"));
             });
         </script>
