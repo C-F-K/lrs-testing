@@ -9,6 +9,7 @@ function logParsedResponse(e){
         var headers = this.getAllResponseHeaders();
         console.log(headers);
         console.log(res);
+        var lrs = $('#request').val();
         if (res.more) {
             var newlrs = lrs.replace(/\/larissa\/xAPI\/statements.*$/, "");
             $('#request').val(newlrs + res.more);
